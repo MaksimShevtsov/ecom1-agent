@@ -12,7 +12,7 @@ load_dotenv()
 ZAI_CODING_PLAN_URL = 'https://api.z.ai/api/coding/paas/v4'
 
 # A/B capabilities that can be switched on via AGENT_FLAGS / --flags.
-KNOWN_FLAGS = frozenset({'reminders', 'planning', 'tool_judge', 'defender', 'defender_ml', 'trajectory'})
+KNOWN_FLAGS = frozenset({'reminders', 'planning', 'tool_judge', 'defender', 'defender_ml', 'trajectory', 'sgr'})
 
 
 def parse_flags(raw: str | None) -> frozenset[str]:

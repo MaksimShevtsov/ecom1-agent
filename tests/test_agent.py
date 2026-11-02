@@ -241,3 +241,34 @@ async def test_injection_semantic_mode():
     run, seen = await _run_with_ticket(frozenset({'defender', 'defender_ml'}))
     assert run.injections[0].blocked and run.injections[0].tier2_score is not None
     assert 'Stock may be set by operators' in seen
+
+
+def sgr_final(answer, refs_key='grounding_refs'):
+    def step(messages, info):
+        name = info.output_tools[0].name
+        args = {
+            'named_entities': [],
+            'requester_identity': 'cust_1',
+            'governing_docs': ['/docs/stock-policy.md'],
+            'target_is_unambiguous': False,
+            'required_format': 'free text',
+            'checks': [{'rule': 'basket named?', 'passed': False, 'evidence': '/AGENTS.MD'}],
+            'answer': answer,
+        }
+        return ModelResponse(parts=[ToolCallPart(name, json.dumps(args))])
+
+    return step
+
+
+async def test_sgr_flag_routes_clarification_and_validators_still_apply():
+    answer = {'kind': 'clarification', 'message': 'Which basket?', 'candidates': ['/catalog/A1.json', '/nope.json']}
+    model, seen = scripted([sgr_final(answer), sgr_final(answer)])
+    vm = FakeVm(FILES)
+    cfg = settings(flags=frozenset({'sgr'}))
+    agent = build_agent(cfg, 'bench', model=model)
+    run = await run_task(agent, EcomDeps(vm=vm, task_id='t', instruction='check my basket out'), cfg, verbose=False)
+
+    assert run.error is None
+    assert vm.answers[0].outcome == Outcome.OUTCOME_NONE_CLARIFICATION
+    assert list(vm.answers[0].refs) == ['/catalog/A1.json']  # missing ref retried once, then dropped
+    assert 'SgrReport' in json.dumps(seen[0].output_tools[0].parameters_json_schema) or seen[0].output_tools

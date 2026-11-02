@@ -108,6 +108,7 @@ The eval reports `injections` / `injections_blocked` metrics and an `InjectionHa
 | `tool_judge` | `ToolCallJudge` (JUDGE_MODEL_ID) on `write_file/delete_file/exec` |
 | `defender` / `defender_ml` | blocking mode of `PromptInjectionDefender` / + ML (see above) |
 | `trajectory` | `TrajectoryJudge(every=8)` |
+| `sgr` | Schema-Guided Reasoning: structured final report (cascade of checks, discriminated answer branches). Experimental: 0.866 over 3 passes vs 0.894 without, so off by default |
 
 ## Configuration
 

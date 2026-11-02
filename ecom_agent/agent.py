@@ -24,7 +24,7 @@ from pydantic_ai_harness.tool_output_limits import Band, ToolOutputLimits, Trunc
 from stackone_defender import DefenseResult
 
 from .config import Settings
-from .models import TaskCompletion
+from .models import TaskCompletion, finalize_sgr
 from .prompts import system_prompt
 from .runtime import EcomDeps, InjectionHit
 from .validation import clean_message, drop_private_refs, resolve_identity
@@ -181,8 +181,8 @@ def build_agent(
     agent = Agent(
         model,
         deps_type=EcomDeps,
-        output_type=TaskCompletion if mode == 'bench' else str,
-        instructions=system_prompt(chat=mode == 'chat'),
+        output_type=(finalize_sgr if 'sgr' in settings.flags else TaskCompletion) if mode == 'bench' else str,
+        instructions=system_prompt(chat=mode == 'chat', sgr='sgr' in settings.flags),
         toolsets=toolsets,
         capabilities=build_capabilities(settings, judge_model=judge_model, fallback_model=fallback_model),
         retries=6,

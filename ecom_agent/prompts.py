@@ -64,8 +64,17 @@ finish (or the task is clearly done), call `report_completion` exactly once; the
 """
 
 
-def system_prompt(*, chat: bool = False) -> str:
+SGR_ADDENDUM = """Your final answer is a structured report. Fill its fields in order, only from what you verified in this run: the task's
+named entities, the requester identity from /bin/id, the governing docs, whether the target record is unambiguous, the
+exact format the task demands, and the checks you performed. Then pick the answer branch that follows from them
+(ambiguous target -> clarification; a failed condition on the targeted record -> unsupported; refused -> denied_security).
+"""
+
+
+def system_prompt(*, chat: bool = False, sgr: bool = False) -> str:
     parts = [SYSTEM_PROMPT]
+    if sgr:
+        parts.append(SGR_ADDENDUM)
     if chat:
         parts.append(CHAT_ADDENDUM)
     if hint := os.getenv('HINT'):
