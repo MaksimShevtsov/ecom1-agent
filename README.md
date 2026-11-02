@@ -15,6 +15,10 @@ An agent for the [BitGN ECOM1](https://bitgn.com/start/ecom) benchmark, built on
 | + deterministic answer validators, higher `run_code` retries (3 passes) | 0.871 | 46-47 per pass |
 | + archive-row ref fix, ambiguity rule (2 passes) | 0.894 | 46 / 49 |
 
+**PROD (blind, 100 tasks, one pass, default config):** mean **0.790**, 73 tasks solved fully. The biggest losses are
+wrong `/proc/catalog` and `/proc/carts` reference sets (about 14 tasks), wrong bare answers (3), wrong outcome (2),
+and partial scores on dispatch (0.82 x5) and payment-amount tasks.
+
 Single passes are noisy (about +/-0.02 between identical runs), and task data is regenerated for every BitGN
 run, so compare averages over several repeats, not individual tasks. DEV scores do not guarantee PROD performance:
 parts of the prompt were derived from DEV failures.
