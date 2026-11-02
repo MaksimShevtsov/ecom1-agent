@@ -26,6 +26,7 @@ async def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('task', help='task id, e.g. t01')
     p.add_argument('--host', default='127.0.0.1')
+    p.add_argument('--allow-remote', action='store_true', help='allow a non-loopback --host (the chat UI has no auth)')
     p.add_argument('--port', type=int, default=7932)
     p.add_argument('--flags', default=None, help='override AGENT_FLAGS')
     p.add_argument('--submit', action='store_true', help='submit the run on exit')
@@ -46,6 +47,8 @@ async def main() -> None:
     agent = build_agent(settings, 'chat')
     app = agent.to_web(deps=deps, instructions=task_prompt(context, trial.instruction))
 
+    if args.host not in ('127.0.0.1', 'localhost', '::1') and not args.allow_remote:
+        raise SystemExit(f'refusing to bind {args.host}: the chat UI has no authentication (use --allow-remote to override)')
     print(f'{GREEN}Chat UI: http://{args.host}:{args.port}{CLR}  (Ctrl+C to stop)')
     server = uvicorn.Server(uvicorn.Config(app, host=args.host, port=args.port, log_level='warning'))
     try:
