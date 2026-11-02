@@ -122,3 +122,7 @@ BitGN key / host / `BENCHMARK_ID`, `MAX_STEPS`, `CONCURRENCY`, `AGENT_FLAGS`, `L
 - Evals are only meaningful on DEV: PROD scores are sealed.
 - Known weak spots: the payment-fraud tasks (t38-t40, t48) recover only part of the incident or flag too many
   payments. A heuristic anomaly tool was tried and made results worse, because the model anchored on its clusters.
+
+## License
+
+[MIT](LICENSE)
